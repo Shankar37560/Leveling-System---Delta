@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DELTA LIFE — WARRIOR'S CODEX</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════
+   DELTA LIFE  |  Warrior's Codex  |  v3.0
+═══════════════════════════════════════════ */
+:root{
+  --bg:         #09090C;
+  --stone-dark: #111115;
+  --stone-mid:  #1A1A22;
+  --stone:      #252530;
+  --ash:        #E8E4DC;
+  --ash-dim:    #9A9690;
+  --ash-ghost:  #3E3D42;
+  --gold:       #C9A84C;
+  --gold-dim:   #7A6428;
+  --gold-bright:#F0C84E;
+  --crimson:    #8B0000;
+  --crimson-hot:#CC1111;
+  --ember:      #FF4500;
+  --fd:'Cinzel Decorative',serif;
+  --fh:'Cinzel',serif;
+  --fu:'Rajdhani',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ash);
+  font-family:var(--fu);min-height:100vh;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -5%,rgba(139,0,0,.22) 0%,transparent 65%),
+    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(80,0,0,.12) 0%,transparent 60%),
+    repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.008) 2px,rgba(255,255,255,.008) 4px);
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--stone-dark)}
+::-webkit-scrollbar-thumb{background:var(--gold-dim);border-radius:3px}
+
+/* ── QUOTES CANVAS (background layer) ── */
+#quotes-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.5}
+
+/* ── PAGE WRAPPER ── */
+.pw{position:relative;z-index:1}
+
+/* ══════════════════════════════════
+   CUSTOMIZE PANEL
+══════════════════════════════════ */
+.cog-btn{
+  position:fixed;bottom:28px;right:28px;z-index:200;
+  width:48px;height:48px;border-radius:50%;
+  background:var(--stone-dark);border:1px solid var(--gold-dim);
+  color:var(--gold);font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);transition:all .2s;
+}
+.cog-btn:hover{background:var(--gold-dim);color:var(--bg);transform:rotate(45deg)}
+
+.customize-panel{
+  position:fixed;top:0;right:0;bottom:0;z-index:300;
+  width:min(420px,95vw);
+  background:var(--stone-dark);
+  border-left:1px solid var(--stone);
+  box-shadow:-8px 0 40px rgba(0,0,0,.8);
+  transform:translateX(100%);
+  transition:transform .35s cubic-bezier(.25,.46,.45,.94);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.customize-panel.open{transform:translateX(0)}
+
+.cp-header{
+  padding:20px 24px 16px;
+  border-bottom:1px solid var(--stone);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.cp-title{font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.cp-close{
+  width:32px;height:32px;border-radius:6px;border:1px solid var(--stone);
+  background:transparent;color:var(--ash-dim);font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.cp-close:hover{background:var(--crimson);color:var(--ash);border-color:var(--crimson-hot)}
+
+.cp-body{padding:20px 24px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:24px}
+
+.cp-section{display:flex;flex-direction:column;gap:12px}
+.cp-section-title{
+  font-family:var(--fh);font-size:10px;font-weight:700;
+  letter-spacing:.35em;color:var(--gold-dim);text-transform:uppercase;
+  padding-bottom:8px;border-bottom:1px solid var(--stone);
+}
+
+/* Form elements inside panel */
+.cp-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cp-label{font-size:12px;font-weight:600;color:var(--ash-dim);min-width:90px;letter-spacing:.04em}
+.cp-input{
+  flex:1;min-width:0;
+  background:var(--stone-mid);border:1px solid var(--stone);
+  color:var(--ash);font-family:var(--fu);font-size:13px;font-weight:500;
+  padding:7px 10px;border-radius:6px;outline:none;
+  transition:border-color .2s;
+}
+.cp-input:focus{border-color:var(--gold-dim)}
+.cp-input[type=color]{
+  width:42px;height:32px;padding:2px;cursor:pointer;flex:none;
+}
+.cp-input[type=number]{width:70px;flex:none}
+
+/* stat row inside customiser */
+.stat-edit-row{
+  display:grid;grid-template-columns:28px 1fr 60px 36px;
+  align-items:center;gap:8px;
+  padding:8px 10px;border-radius:6px;
+  background:rgba(255,255,255,.025);border:1px solid var(--stone);
+}
+.sed-sym{
+  width:28px;height:28px;border-radius:5px;
+  background:var(--stone);border:1px solid var(--stone);
+  color:var(--ash);font-size:13px;font-weight:700;text-align:center;
+  font-family:var(--fh);outline:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .2s;
+}
+.sed-name{
+  background:transparent;border:none;border-bottom:1px solid var(--stone);
+  color:var(--ash);font-family:var(--fh);font-size:11px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;outline:none;
+  padding:3px 0;transition:border-color .2s;
+  width:100%;
+}
+.sed-name:focus,.sed-sym:focus{border-color:var(--gold-dim)}
+.sed-color{
+  width:36px;height:28px;border-radius:5px;padding:2px;
+  border:1px solid var(--stone);cursor:pointer;background:var(--stone);
+}
+
+.cp-btn{
+  padding:9px 16px;border-radius:6px;border:none;cursor:pointer;
+  font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;transition:all .2s;
+}
+.cp-btn.gold{background:var(--gold-dim);color:var(--ash);border:1px solid var(--gold)}
+.cp-btn.gold:hover{background:var(--gold);color:var(--bg)}
+.cp-btn.danger{background:rgba(139,0,0,.3);color:var(--crimson-hot);border:1px solid var(--crimson)}
+.cp-btn.danger:hover{background:var(--crimson);color:var(--ash)}
+.cp-btn-row{display:flex;gap:10px;flex-wrap:wrap}
+
+.save-indicator{
+  position:fixed;top:20px;left:50%;transform:translateX(-50%);
+  background:var(--stone-dark);border:1px solid var(--gold-dim);
+  color:var(--gold);font-family:var(--fh);font-size:11px;font-weight:700;
+  letter-spacing:.15em;padding:8px 20px;border-radius:20px;
+  opacity:0;transition:opacity .3s;z-index:400;pointer-events:none;
+}
+.save-indicator.show{opacity:1}
+
+/* ═══════════════════════════
+   HEADER
+═══════════════════════════ */
+.war-header{text-align:center;padding:44px 24px 28px;position:relative}
+.emblem-ring{
+  width:72px;height:72px;border-radius:50%;
+  border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;
+  box-shadow:0 0 28px rgba(201,168,76,.45),inset 0 0 10px rgba(201,168,76,.1);
+  animation:epulse 3s ease-in-out infinite;position:relative;
+}
+.emblem-ring::before{content:'';position:absolute;inset:-9px;border-radius:50%;border:1px solid rgba(201,168,76,.18)}
+.emblem-ring::after{content:'';position:absolute;inset:-19px;border-radius:50%;border:1px solid rgba(201,168,76,.08)}
+@keyframes epulse{
+  0%,100%{box-shadow:0 0 28px rgba(201,168,76,.45),inset 0 0 10px rgba(201,168,76,.1)}
+  50%    {box-shadow:0 0 55px rgba(201,168,76,.7), inset 0 0 20px rgba(201,168,76,.2)}
+}
+.emblem-inner{font-family:var(--fd);font-size:30px;color:var(--gold);text-shadow:0 0 16px rgba(201,168,76,.9);line-height:1}
+.header-eyebrow{font-family:var(--fu);font-size:10px;font-weight:700;letter-spacing:.38em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:6px}
+.header-title{
+  font-family:var(--fd);
+  font-size:clamp(34px,6.5vw,68px);
+  font-weight:900;color:var(--ash);
+  letter-spacing:.07em;
+  text-shadow:0 0 50px rgba(201,168,76,.28),0 2px 4px rgba(0,0,0,.9);
+  line-height:1.1;margin-bottom:10px;
+}
+.header-sub{font-family:var(--fu);font-size:12px;font-weight:400;letter-spacing:.24em;color:var(--ash-dim);text-transform:uppercase}
+.header-divider{width:300px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:24px auto 0;position:relative}
+.header-divider::before{
+  content:'✦';position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);color:var(--gold);font-size:13px;
+  background:var(--bg);padding:0 10px;
+}
+
+/* ═══════════════════════════
+   SECTION LABEL
+═══════════════════════════ */
+.section-label{
+  font-family:var(--fh);font-size:10px;font-weight:700;
+  letter-spacing:.42em;color:var(--gold-dim);
+  text-transform:uppercase;text-align:center;
+  margin-bottom:20px;position:relative;
+}
+.section-label::before,.section-label::after{content:'';display:inline-block;width:36px;height:1px;background:var(--gold-dim);vertical-align:middle;margin:0 10px}
+
+/* ═══════════════════════════
+   PROFILE
+═══════════════════════════ */
+.warrior-profile{padding:0 20px 28px;max-width:960px;margin:0 auto}
+.profile-card{
+  background:var(--stone-dark);border:1px solid var(--stone);
+  border-top:2px solid var(--gold-dim);border-radius:8px;
+  padding:20px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  box-shadow:0 8px 32px rgba(0,0,0,.65),inset 0 1px 0 rgba(201,168,76,.08);
+}
+.profile-avatar{
+  width:60px;height:60px;
+  background:radial-gradient(circle,var(--crimson) 0%,#440000 60%,transparent 100%);
+  border:2px solid var(--crimson-hot);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;font-family:var(--fh);color:var(--gold);font-weight:700;
+  flex-shrink:0;box-shadow:0 0 22px rgba(204,17,17,.45);
+}
+.profile-info{flex:1;min-width:130px}
+.profile-lbl{font-size:9px;font-weight:700;letter-spacing:.4em;color:var(--ash-ghost);text-transform:uppercase;margin-bottom:3px}
+.profile-name{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--ash);letter-spacing:.06em;line-height:1;margin-bottom:4px}
+.profile-rank{font-family:var(--fu);font-size:14px;font-weight:600;color:var(--gold);letter-spacing:.1em;transition:color .4s,text-shadow .4s}
+.profile-qs{display:flex;gap:28px;flex-wrap:wrap}
+.qs{display:flex;flex-direction:column;align-items:center;gap:2px}
+.qs-lbl{font-size:9px;font-weight:700;letter-spacing:.32em;color:var(--ash-ghost);text-transform:uppercase}
+.qs-val{font-family:var(--fh);font-size:26px;font-weight:700;color:var(--gold-bright);line-height:1;text-shadow:0 0 12px rgba(240,200,78,.5)}
+
+/* ═══════════════════════════
+   ARENA GRID
+═══════════════════════════ */
+.arena{
+  max-width:1120px;margin:0 auto;padding:0 20px 44px;
+  display:grid;grid-template-columns:1fr 1.1fr;gap:36px;align-items:start;
+}
+@media(max-width:780px){.arena{grid-template-columns:1fr}}
+
+/* ═══════════════════════════
+   CHART
+═══════════════════════════ */
+.chart-section{position:sticky;top:20px}
+.chart-wrap{
+  position:relative;width:100%;max-width:480px;margin:0 auto;
+  background:var(--stone-dark);border:1px solid var(--stone);
+  border-radius:12px;padding:12px;
+  box-shadow:0 0 60px rgba(139,0,0,.2),0 0 120px rgba(139,0,0,.08),inset 0 0 30px rgba(0,0,0,.4);
+}
+.chart-glow{position:absolute;inset:-4px;border-radius:14px;border:1px solid rgba(201,168,76,.18);pointer-events:none;animation:rpulse 4s ease-in-out infinite}
+@keyframes rpulse{
+  0%,100%{box-shadow:0 0 18px rgba(201,168,76,.12),0 0 50px rgba(201,168,76,.04)}
+  50%    {box-shadow:0 0 38px rgba(201,168,76,.28),0 0 80px rgba(201,168,76,.1)}
+}
+#polarChart{display:block;width:100%;height:auto}
+
+/* ═══════════════════════════
+   STAT CARDS  — STEP 4 BLOCK
+═══════════════════════════ */
+.stats-grid{display:flex;flex-direction:column;gap:10px}
+.stat-card{
+  background:var(--stone-dark);border:1px solid var(--stone);border-radius:8px;
+  padding:12px 14px;
+  display:grid;grid-template-columns:36px 1fr auto;
+  align-items:center;gap:11px;
+  transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sc,var(--gold));opacity:.9}
+.stat-card:hover{border-color:var(--sc,var(--gold));box-shadow:0 4px 18px rgba(0,0,0,.5)}
+
+.stat-sym{
+  width:36px;height:36px;border-radius:6px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fh);font-size:14px;font-weight:700;
+  color:var(--sc,var(--gold));flex-shrink:0;
+}
+.stat-info{min-width:0}
+.stat-hdr{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px;gap:6px}
+.stat-name{
+  font-family:var(--fh);font-size:11px;font-weight:700;color:var(--ash);
+  letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.stat-badge{font-family:var(--fh);font-size:10px;font-weight:700;color:var(--sc,var(--gold));white-space:nowrap;flex-shrink:0}
+.stat-badge span{font-size:15px}
+.xp-track{width:100%;height:5px;background:var(--stone);border-radius:3px;overflow:hidden;margin-bottom:4px}
+.xp-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--sc,var(--gold)) 0%,rgba(255,255,255,.55) 130%);
+  box-shadow:0 0 7px var(--sc,var(--gold));
+  transition:width .45s cubic-bezier(.25,.46,.45,.94);
+}
+.xp-lbl{font-size:10px;color:var(--ash-ghost);font-weight:500;letter-spacing:.04em}
+
+.stat-btns{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.btn-s{
+  width:34px;height:34px;border-radius:6px;
+  border:1px solid rgba(255,255,255,.09);
+  background:rgba(255,255,255,.04);
+  font-size:18px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;user-select:none;font-family:var(--fu);
+}
+.btn-s.plus{border-color:rgba(201,168,76,.3);color:var(--gold-bright)}
+.btn-s.plus:hover{background:var(--gold-dim);border-color:var(--gold);color:var(--bg);box-shadow:0 0 14px rgba(201,168,76,.45);transform:scale(1.1)}
+.btn-s.minus{border-color:rgba(139,0,0,.3);color:var(--crimson-hot)}
+.btn-s.minus:hover{background:var(--crimson);border-color:var(--crimson-hot);color:var(--ash);box-shadow:0 0 14px rgba(139,0,0,.45);transform:scale(1.1)}
+.btn-s:active{transform:scale(.92)!important}
+
+/* ═══════════════════════════
+   LOG
+═══════════════════════════ */
+.log-section{max-width:960px;margin:0 auto;padding:0 20px 44px}
+.log-scroll{
+  background:var(--stone-dark);border:1px solid var(--stone);
+  border-radius:8px;padding:14px 18px;max-height:190px;
+  overflow-y:auto;display:flex;flex-direction:column-reverse;gap:7px;
+}
+.log-entry{
+  font-size:12px;font-weight:500;color:var(--ash-dim);
+  padding:7px 11px;border-radius:5px;
+  background:rgba(255,255,255,.018);
+  border-left:2px solid var(--stone);letter-spacing:.02em;
+  animation:lin .3s ease;
+}
+@keyframes lin{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.log-entry.sys {border-left-color:var(--gold-dim);color:var(--gold)}
+.log-entry.up  {border-left-color:#2AFFC0;color:#2AFFC0}
+.log-entry.dn  {border-left-color:var(--crimson-hot);color:var(--ash-dim)}
+.log-entry.rank{border-left-color:var(--ember);color:var(--ember);font-weight:700}
+
+/* ═══════════════════════════
+   FOOTER
+═══════════════════════════ */
+.war-footer{text-align:center;padding:22px;border-top:1px solid var(--stone)}
+.footer-motto{font-family:var(--fh);font-size:10px;letter-spacing:.4em;color:var(--ash-ghost);text-transform:uppercase}
+
+/* ═══════════════════════════
+   ANIMATIONS
+═══════════════════════════ */
+@keyframes lflash{0%{background:rgba(240,200,78,.18)}100%{background:transparent}}
+.stat-card.lvlup{animation:lflash .8s ease forwards}
+
+@keyframes rglow{0%,100%{text-shadow:none}35%{text-shadow:0 0 22px currentColor,0 0 44px currentColor}}
+.profile-rank.rankup{animation:rglow 1.3s ease}
+
+/* ── Tooltip for symbol picker ── */
+.sym-popup{
+  position:fixed;z-index:500;
+  background:var(--stone-dark);border:1px solid var(--stone);
+  border-radius:8px;padding:10px;
+  display:grid;grid-template-columns:repeat(6,32px);gap:4px;
+  box-shadow:0 8px 32px rgba(0,0,0,.7);
+}
+.sym-opt{
+  width:32px;height:32px;border-radius:5px;border:1px solid var(--stone);
+  background:var(--stone-mid);color:var(--ash);
+  font-family:var(--fh);font-size:13px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.sym-opt:hover{background:var(--gold-dim);color:var(--bg);border-color:var(--gold)}
+</style>
+</head>
+<body>
+
+<canvas id="quotes-canvas"></canvas>
+<div id="save-indicator" class="save-indicator">✦ SAVED</div>
+
+<div class="pw">
+
+<!-- ═══ HEADER ═══ -->
+<header class="war-header">
+  <div class="emblem-ring"><div class="emblem-inner" id="emblem-char">Δ</div></div>
+  <div class="header-eyebrow" id="hdr-eyebrow">THE WARRIOR'S CODEX</div>
+  <h1 class="header-title" id="hdr-title">DELTA LIFE</h1>
+  <div class="header-sub" id="hdr-sub">FORGE YOURSELF. CONQUER EVERYTHING.</div>
+  <div class="header-divider"></div>
+</header>
+
+<!-- ═══ PROFILE ═══ -->
+<section class="warrior-profile">
+  <div class="profile-card">
+    <div class="profile-avatar" id="avatar-char">Δ</div>
+    <div class="profile-info">
+      <div class="profile-lbl">WARRIOR</div>
+      <div class="profile-name" id="profile-name">DELTA</div>
+      <div class="profile-rank" id="profile-rank">Nameless Shade</div>
+    </div>
+    <div class="profile-qs">
+      <div class="qs"><span class="qs-lbl">TOTAL LVL</span><span class="qs-val" id="total-lvl">8</span></div>
+      <div class="qs"><span class="qs-lbl">AVG LVL</span><span class="qs-val" id="avg-lvl">1</span></div>
+      <div class="qs"><span class="qs-lbl">POWER</span><span class="qs-val" id="total-pwr">0</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ARENA ═══ -->
+<main class="arena">
+
+  <section class="chart-section">
+    <div class="section-label">BATTLE RADAR</div>
+    <div class="chart-wrap" id="chart-wrap">
+      <canvas id="polarChart"></canvas>
+      <div class="chart-glow"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       STAT CONTROL PANEL — STEP 4 BLOCK
+       Each card: symbol · name · level bar · +/−
+  ═══════════════════════════════════════════════ -->
+  <section id="stat-controls-block">
+    <div class="section-label">STAT FORGE</div>
+    <div class="stats-grid" id="stats-grid"></div>
+  </section>
+  <!-- ═══════════ END STEP 4 BLOCK ═══════════ -->
+
+</main>
+
+<!-- ═══ LOG ═══ -->
+<section class="log-section">
+  <div class="section-label">WARRIOR'S LOG</div>
+  <div class="log-scroll" id="log-scroll">
+    <div class="log-entry sys">✦ The Warrior's path begins. Forge your legend.</div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="war-footer">
+  <span class="footer-motto" id="footer-motto">ΜΟΛΩΝ ΛΑΒΕ — COME AND TAKE THEM</span>
+</footer>
+
+</div><!-- /pw -->
+
+<!-- ═══ COG BUTTON ═══ -->
+<button class="cog-btn" onclick="togglePanel()" title="Customise">⚙</button>
+
+<!-- ═══════════════════════════════════════════════
+     CUSTOMIZE PANEL
+═══════════════════════════════════════════════ -->
+<div class="customize-panel" id="customize-panel">
+  <div class="cp-header">
+    <div class="cp-title">⚙ Customise</div>
+    <button class="cp-close" onclick="togglePanel()">✕</button>
+  </div>
+
+  <div class="cp-body">
+
+    <!-- IDENTITY -->
+    <div class="cp-section">
+      <div class="cp-section-title">Identity</div>
+      <div class="cp-row">
+        <span class="cp-label">Warrior Name</span>
+        <input class="cp-input" id="cp-warrior-name" type="text" maxlength="18" placeholder="DELTA" oninput="liveUpdate()"/>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Main Title</span>
+        <input class="cp-input" id="cp-main-title" type="text" maxlength="24" placeholder="DELTA LIFE" oninput="liveUpdate()"/>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Subtitle</span>
+        <input class="cp-input" id="cp-subtitle" type="text" maxlength="48" placeholder="FORGE YOURSELF..." oninput="liveUpdate()"/>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Eyebrow</span>
+        <input class="cp-input" id="cp-eyebrow" type="text" maxlength="32" placeholder="THE WARRIOR'S CODEX" oninput="liveUpdate()"/>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Footer Quote</span>
+        <input class="cp-input" id="cp-footer" type="text" maxlength="64" placeholder="ΜΟΛΩΝ ΛΑΒΕ..." oninput="liveUpdate()"/>
+      </div>
+      <div class="cp-row">
+        <span class="cp-label">Emblem Symbol</span>
+        <input class="cp-input" id="cp-emblem" type="text" maxlength="2" placeholder="Δ" oninput="liveUpdate()"/>
+      </div>
+    </div>
+
+    <!-- STATS EDIT -->
+    <div class="cp-section">
+      <div class="cp-section-title">Stats</div>
+      <div id="cp-stats-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    </div>
+
+    <!-- LEVEL SETTINGS -->
+    <div class="cp-section">
+      <div class="cp-section-title">Level Settings</div>
+      <div class="cp-row">
+        <span class="cp-label">Max Level</span>
+        <input class="cp-input" id="cp-max-level" type="number" min="10" max="9999" value="100"/>
+      </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="cp-section">
+      <div class="cp-section-title">Data</div>
+      <div class="cp-btn-row">
+        <button class="cp-btn gold" onclick="applyAndSave()">✦ Save All</button>
+        <button class="cp-btn danger" onclick="confirmReset()">⚠ Reset Progress</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SYMBOL PICKER (injected dynamically) -->
+<div class="sym-popup" id="sym-popup" style="display:none"></div>
+
+<script>
+/* ╔════════════════════════════════════════════════════════════╗
+   ║  DELTA LIFE  v3.0  —  STATS ENGINE + SAVE + CUSTOMISE    ║
+   ╚════════════════════════════════════════════════════════════╝ */
+
+/* ══════════════════════════════════════════════════════════════
+   1. DEFAULT CONFIGURATION  (overridden by localStorage)
+══════════════════════════════════════════════════════════════ */
+const DEFAULT_CONFIG = {
+  warriorName: 'DELTA',
+  mainTitle:   'DELTA LIFE',
+  subtitle:    'FORGE YOURSELF. CONQUER EVERYTHING.',
+  eyebrow:     "THE WARRIOR'S CODEX",
+  footer:      'ΜΟΛΩΝ ΛΑΒΕ — COME AND TAKE THEM',
+  emblem:      'Δ',
+  xpPerClick:  100,
+  maxLevel:    100,
+  stats: [
+    { id:'strength',  name:'Strength',  sym:'STR', color:'#FF4500' },
+    { id:'control',   name:'Control',   sym:'CTL', color:'#2AFFC0' },
+    { id:'knowledge', name:'Knowledge', sym:'KNW', color:'#5B8AFF' },
+    { id:'mastery',   name:'Mastery',   sym:'MST', color:'#FF2232' },
+    { id:'soul',      name:'Soul',      sym:'SOL', color:'#FF2D78' },
+    { id:'air1',      name:'AIR 1',     sym:'AIR', color:'#F0C84E' },
+    { id:'worth',     name:'Worth',     sym:'WTH', color:'#CC3333' },
+    { id:'honor',     name:'Honor',     sym:'HON', color:'#A0E4FF' },
+  ],
+};
+
+/* ══════════════════════════════════════════════════════════════
+   2. RANK SYSTEM
+══════════════════════════════════════════════════════════════ */
+const RANKS = [
+  { min:0,   title:'Nameless',           color:'#5A5A6A' },
+  { min:10,  title:'Low Class Saiyan',   color:'#8B8B9A' },
+  { min:20,  title:'D-Rank Saiyan',      color:'#8B6914' },
+  { min:35,  title:'Commander Of Oneself',color:'#A0A0B0'},
+  { min:47,  title:'Attained Peace',     color:'#4FC3F7' },
+  { min:60,  title:'A-Rank Worthy',      color:'#AB47BC' },
+  { min:78,  title:'Achieved Power',     color:'#FF7043' },
+  { min:98,  title:'Legendary Saiyan',   color:'#FFD700' },
+  { min:120, title:'Proud Bloodline',    color:'#E53935' },
+  { min:145, title:'Sage of Self',       color:'#7E57C2' },
+  { min:173, title:'Shadow Commander',   color:'#FFF176' },
+  { min:200, title:'Shadow Monarch',     color:'#B39DDB' },
+  { min:230, title:'✦ MASTER OF SELF ✦', color:'#FFFFFF' },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   3. SYMBOL LIBRARY  (used in the sym picker)
+══════════════════════════════════════════════════════════════ */
+const SYMBOLS = [
+  'STR','CTL','KNW','MST','SOL','AIR','WTH','HON',
+  'PWR','SPD','INT','AGI','WIS','VIT','END','VAL',
+  'Σ','Δ','Ω','Λ','Φ','Ψ','Γ','Θ',
+  '★','✦','◆','▲','►','●','⬡','⊕',
+  'I','II','III','IV','V','VI','VII','VIII',
+];
+
+/* ══════════════════════════════════════════════════════════════
+   4. STATE & LOAD FROM LOCALSTORAGE
+══════════════════════════════════════════════════════════════ */
+let CFG   = JSON.parse(JSON.stringify(DEFAULT_CONFIG)); // deep copy
+let state = {};  // stat id → { level, xp }
+let prevRankMin = 0;
+
+const LS_CFG   = 'deltalife_config';
+const LS_STATE = 'deltalife_state';
+
+function loadFromStorage(){
+  try {
+    const sc = localStorage.getItem(LS_CFG);
+    if(sc) CFG = Object.assign(JSON.parse(JSON.stringify(DEFAULT_CONFIG)), JSON.parse(sc));
+    const ss = localStorage.getItem(LS_STATE);
+    if(ss){
+      const saved = JSON.parse(ss);
+      CFG.stats.forEach(s=>{
+        const lv = saved[s.id]?.level || 1;
+        state[s.id] = { level: Math.max(1, parseInt(lv)||1) };
+      });
+    } else {
+      CFG.stats.forEach(s=>{ state[s.id]={ level:1 }; });
+    }
+    prevRankMin = getRank(getTotalLevel()).min;
+  } catch(e){
+    CFG.stats.forEach(s=>{ state[s.id]={ level:1, xp:0 }; });
+  }
+}
+
+function saveToStorage(){
+  try {
+    localStorage.setItem(LS_CFG,   JSON.stringify(CFG));
+    localStorage.setItem(LS_STATE, JSON.stringify(state));
+    flashSaveIndicator();
+  } catch(e){ console.warn('Save failed',e); }
+}
+
+function flashSaveIndicator(){
+  const el=document.getElementById('save-indicator');
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('show'),1800);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   5. HELPERS
+══════════════════════════════════════════════════════════════ */
+function getTotalLevel(){ return CFG.stats.reduce((a,s)=>a+(state[s.id]?.level||1),0); }
+function getPower(){ return CFG.stats.reduce((a,s)=>a+(state[s.id]?.level||1)*12,0); }
+function getRank(total){
+  let r=RANKS[0];
+  for(const x of RANKS){ if(total>=x.min) r=x; }
+  return r;
+}
+
+function addLog(msg,type=''){
+  const log=document.getElementById('log-scroll');
+  const el=document.createElement('div');
+  el.className='log-entry '+type;
+  el.textContent=msg;
+  log.prepend(el);
+  while(log.children.length>80) log.removeChild(log.lastChild);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   6. FLOATING QUOTES
+══════════════════════════════════════════════════════════════ */
+const QUOTES=[
+  '"Pain is temporary. Quitting lasts forever."',
+  '"Arise."',
+  '"I am the Shadow Monarch."',
+  '"The weak die. The strong survive."',
+  '"Fear is just a feeling. Push through it."',
+  '"My greatest rival is who I was yesterday."',
+  '"The only easy day was yesterday."',
+  '"Forge yourself in fire."',
+  '"Every level costs something."',
+  '"Stay hard."',
+  '"No shortcuts. No excuses."',
+  '"Rise. Grind. Ascend."',
+  '"I will not be stopped."',
+  '"Eren did not give up. Neither will I."',
+  '"Limits are illusions."',
+  '"I alone am the strongest."',
+];
+
+(function initQuotes(){
+  const canvas=document.getElementById('quotes-canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  const parts=[];
+  function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+  resize(); window.addEventListener('resize',resize);
+  function spawn(){
+    parts.push({
+      text:QUOTES[Math.floor(Math.random()*QUOTES.length)],
+      x:Math.random()*W, y:H+30,
+      speed:0.26+Math.random()*.3,
+      size:10+Math.floor(Math.random()*5),
+      drift:(Math.random()-.5)*.22,
+      life:0, maxLife:340+Math.floor(Math.random()*180),
+    });
+  }
+  spawn(); spawn();
+  setInterval(()=>{ if(parts.length<5) spawn(); },5800);
+  (function tick(){
+    ctx.clearRect(0,0,W,H);
+    for(let i=parts.length-1;i>=0;i--){
+      const p=parts[i];
+      p.y-=p.speed; p.x+=p.drift; p.life++;
+      let a=p.life<60?p.life/60:p.life>p.maxLife-60?(p.maxLife-p.life)/60:1;
+      if(p.life>p.maxLife){ parts.splice(i,1); continue; }
+      ctx.save();
+      ctx.globalAlpha=a*.68;
+      ctx.font=`italic ${p.size}px Cinzel,serif`;
+      ctx.fillStyle='#C9A84C';
+      ctx.shadowColor='rgba(201,168,76,.55)';
+      ctx.shadowBlur=9;
+      ctx.textAlign='center';
+      ctx.fillText(p.text,p.x,p.y);
+      ctx.restore();
+    }
+    requestAnimationFrame(tick);
+  })();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   7. POLAR CHART — Pure Canvas, No Dependencies
+══════════════════════════════════════════════════════════════ */
+const PAD=64;
+let animT={}, animC={}, animRAF=null;
+
+function initAnim(){
+  CFG.stats.forEach(s=>{ animT[s.id]=state[s.id]?.level||1; animC[s.id]=0; });
+}
+
+function sizeCanvas(){
+  const canvas=document.getElementById('polarChart');
+  const wrap=document.getElementById('chart-wrap');
+  const sz=Math.max(280,Math.min(wrap.clientWidth-24,520));
+  canvas.width=sz; canvas.height=sz;
+}
+
+function drawChart(){
+  const canvas=document.getElementById('polarChart');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  if(!W||!H) return;
+  const cx=W/2,cy=H/2,R=W/2-PAD;
+  const stats=CFG.stats;
+  const n=stats.length;
+  const slice=(Math.PI*2)/n;
+  const MAXV=CFG.maxLevel||100;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background disc
+  ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,0,0,.38)'; ctx.fill();
+
+  // Grid rings
+  for(let r=1;r<=5;r++){
+    const rv=(r/5)*R;
+    ctx.beginPath(); ctx.arc(cx,cy,rv,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.fillStyle='rgba(200,195,185,.25)';
+    ctx.font='bold 9px Rajdhani,sans-serif'; ctx.textAlign='center';
+    ctx.fillText(Math.round((r/5)*MAXV),cx,cy-rv+13);
+  }
+
+  // Spokes
+  for(let i=0;i<n;i++){
+    const a=slice*i-Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+    ctx.strokeStyle='rgba(201,168,76,.14)'; ctx.lineWidth=1; ctx.stroke();
+  }
+
+  // Wedges
+  for(let i=0;i<n;i++){
+    const s=stats[i];
+    const val=animC[s.id]||.01;
+    const rv=(val/MAXV)*R;
+    const aS=slice*i-Math.PI/2, aE=slice*(i+1)-Math.PI/2;
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,rv,aS,aE); ctx.closePath();
+    const midA=(aS+aE)/2;
+    const grd=ctx.createRadialGradient(cx,cy,0,cx+Math.cos(midA)*rv*.7,cy+Math.sin(midA)*rv*.7,rv);
+    grd.addColorStop(0,s.color+'33'); grd.addColorStop(1,s.color+'CC');
+    ctx.fillStyle=grd; ctx.fill();
+    ctx.strokeStyle=s.color; ctx.lineWidth=1.8; ctx.stroke();
+  }
+
+  // Outline polygon
+  ctx.beginPath();
+  for(let i=0;i<n;i++){
+    const s=stats[i];
+    const rv=((animC[s.id]||.01)/MAXV)*R;
+    const a=slice*i-Math.PI/2;
+    const px=cx+Math.cos(a)*rv,py=cy+Math.sin(a)*rv;
+    i===0?ctx.moveTo(px,py):ctx.lineTo(px,py);
+  }
+  ctx.closePath(); ctx.strokeStyle='rgba(255,255,255,.2)'; ctx.lineWidth=1.4; ctx.stroke();
+
+  // Tip dots
+  for(let i=0;i<n;i++){
+    const s=stats[i];
+    const rv=((animC[s.id]||.01)/MAXV)*R;
+    const a=slice*i-Math.PI/2;
+    const px=cx+Math.cos(a)*rv,py=cy+Math.sin(a)*rv;
+    ctx.beginPath(); ctx.arc(px,py,4.5,0,Math.PI*2);
+    ctx.fillStyle=s.color; ctx.fill();
+    ctx.strokeStyle='#FFF'; ctx.lineWidth=1.5; ctx.stroke();
+  }
+
+  // Labels
+  const LR=R+44;
+  for(let i=0;i<n;i++){
+    const s=stats[i];
+    const a=slice*i-Math.PI/2;
+    const lx=cx+Math.cos(a)*LR, ly=cy+Math.sin(a)*LR;
+
+    // Symbol badge
+    ctx.font='bold 11px Cinzel,serif';
+    ctx.fillStyle=s.color;
+    ctx.textAlign='center';
+    ctx.fillText(s.sym||s.name.slice(0,3).toUpperCase(),lx,ly+3);
+
+    ctx.font='600 8px Rajdhani,sans-serif';
+    ctx.fillStyle='rgba(220,215,205,.5)';
+    ctx.fillText('LV '+(state[s.id]?.level||1),lx,ly+14);
+  }
+
+  // Centre emblem
+  ctx.font='bold 20px Cinzel Decorative,serif';
+  ctx.fillStyle='rgba(201,168,76,.8)';
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(CFG.emblem||'Δ',cx,cy);
+  ctx.textBaseline='alphabetic';
+}
+
+function animChart(){
+  let done=true;
+  CFG.stats.forEach(s=>{
+    const d=animT[s.id]-(animC[s.id]||0);
+    if(Math.abs(d)>.05){ animC[s.id]=(animC[s.id]||0)+d*.13; done=false; }
+    else animC[s.id]=animT[s.id];
+  });
+  drawChart();
+  if(!done) animRAF=requestAnimationFrame(animChart);
+  else animRAF=null;
+}
+
+function triggerChartAnim(){
+  CFG.stats.forEach(s=>{ animT[s.id]=state[s.id]?.level||1; });
+  if(!animRAF) animRAF=requestAnimationFrame(animChart);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   8. STAT CARDS  — STEP 4 BLOCK
+══════════════════════════════════════════════════════════════ */
+function buildStatCards(){
+  const grid=document.getElementById('stats-grid');
+  grid.innerHTML='';
+  CFG.stats.forEach(s=>{
+    const st=state[s.id]||{level:1};
+    const MAXV=CFG.maxLevel||100;
+    const pct=Math.min(100, Math.floor((st.level/MAXV)*100));
+
+    const card=document.createElement('div');
+    card.className='stat-card'; card.id='card-'+s.id;
+    card.style.setProperty('--sc',s.color);
+    card.innerHTML=`
+      <div class="stat-sym" style="color:${s.color}">${s.sym||s.name.slice(0,3).toUpperCase()}</div>
+      <div class="stat-info">
+        <div class="stat-hdr">
+          <span class="stat-name">${s.name.toUpperCase()}</span>
+          <span class="stat-badge">LV <span id="lvl-${s.id}">${st.level}</span></span>
+        </div>
+        <div class="xp-track"><div class="xp-fill" id="bar-${s.id}" style="width:${pct}%"></div></div>
+        <div class="xp-lbl" id="xpl-${s.id}">LV ${st.level} / ${MAXV}</div>
+      </div>
+      <div class="stat-btns">
+        <button class="btn-s plus"  onclick="changeLvl('${s.id}',1)"  title="+1 Level">＋</button>
+        <button class="btn-s minus" onclick="changeLvl('${s.id}',-1)" title="−1 Level">－</button>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   9. LEVEL CHANGE — + is exactly +1 level, − is exactly −1 level
+      No XP system. State only tracks { level }.
+══════════════════════════════════════════════════════════════ */
+function changeLvl(id, delta){
+  const s=CFG.stats.find(x=>x.id===id);
+  const st=state[id]||{level:1};
+  const MAXV=CFG.maxLevel||100;
+
+  if(delta>0){
+    if(st.level<MAXV){
+      st.level++;
+      addLog('↑ '+s.name.toUpperCase()+' → LV '+st.level,'up');
+      flashCard(id);
+    }
+  } else {
+    if(st.level>1){
+      st.level--;
+      addLog('↓ '+s.name.toUpperCase()+' → LV '+st.level,'dn');
+    }
+  }
+
+  state[id]=st;
+  refreshCard(id);
+  triggerChartAnim();
+  updateProfile();
+  saveToStorage();
+}
+
+function refreshCard(id){
+  const st=state[id]||{level:1};
+  const MAXV=CFG.maxLevel||100;
+  const pct=Math.min(100, Math.floor((st.level/MAXV)*100));
+  const lvEl=document.getElementById('lvl-'+id);
+  const barEl=document.getElementById('bar-'+id);
+  const lblEl=document.getElementById('xpl-'+id);
+  if(lvEl)  lvEl.textContent=st.level;
+  if(barEl) barEl.style.width=pct+'%';
+  if(lblEl) lblEl.textContent=st.level>=MAXV?'MAX — LEGENDARY':'LV '+st.level+' / '+MAXV;
+}
+
+function flashCard(id){
+  const c=document.getElementById('card-'+id);
+  if(!c) return;
+  c.classList.remove('lvlup'); void c.offsetWidth; c.classList.add('lvlup');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   10. PROFILE + RANK
+══════════════════════════════════════════════════════════════ */
+function updateProfile(){
+  const total=getTotalLevel();
+  const avg=Math.floor(total/CFG.stats.length);
+  const pwr=getPower();
+  setText('total-lvl',total);
+  setText('avg-lvl',avg);
+  setText('total-pwr',pwr.toLocaleString());
+
+  const rank=getRank(total);
+  const rEl=document.getElementById('profile-rank');
+  rEl.textContent=rank.title;
+  rEl.style.color=rank.color;
+
+  if(rank.min>prevRankMin){
+    addLog('◆ RANK UNLOCKED: '+rank.title.toUpperCase(),'rank');
+    rEl.classList.remove('rankup'); void rEl.offsetWidth; rEl.classList.add('rankup');
+    prevRankMin=rank.min;
+  }
+}
+
+function setText(id,val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+
+/* ══════════════════════════════════════════════════════════════
+   11. CUSTOMISE PANEL
+══════════════════════════════════════════════════════════════ */
+function togglePanel(){
+  const p=document.getElementById('customize-panel');
+  if(p.classList.contains('open')){ p.classList.remove('open'); closeSymPopup(); }
+  else { populatePanel(); p.classList.add('open'); }
+}
+
+function populatePanel(){
+  // Fill identity fields
+  const set=(id,val)=>{ const el=document.getElementById(id); if(el) el.value=val||''; };
+  set('cp-warrior-name',CFG.warriorName);
+  set('cp-main-title',  CFG.mainTitle);
+  set('cp-subtitle',    CFG.subtitle);
+  set('cp-eyebrow',     CFG.eyebrow);
+  set('cp-footer',      CFG.footer);
+  set('cp-emblem',      CFG.emblem);
+  set('cp-max-level',   CFG.maxLevel||100);
+
+  // Stat rows
+  const list=document.getElementById('cp-stats-list');
+  list.innerHTML='';
+  CFG.stats.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.className='stat-edit-row';
+    row.id='ser-'+i;
+    row.innerHTML=`
+      <div class="sed-sym" id="sym-btn-${i}" onclick="openSymPicker(${i})" title="Pick symbol" style="color:${s.color};border-color:${s.color}44;cursor:pointer">${s.sym||'???'}</div>
+      <input class="sed-name" id="sn-${i}" type="text" value="${s.name}" maxlength="16" placeholder="Stat name" oninput="liveStatUpdate(${i})"/>
+      <input class="sed-color" id="sc-${i}" type="color" value="${s.color}" oninput="liveStatUpdate(${i})"/>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function liveUpdate(){
+  const gv=id=>document.getElementById(id)?.value||'';
+  setText('hdr-title',     gv('cp-main-title').toUpperCase()||CFG.mainTitle);
+  setText('hdr-sub',       gv('cp-subtitle')||CFG.subtitle);
+  setText('hdr-eyebrow',   gv('cp-eyebrow').toUpperCase()||CFG.eyebrow);
+  setText('profile-name',  gv('cp-warrior-name').toUpperCase()||CFG.warriorName);
+  setText('footer-motto',  gv('cp-footer')||CFG.footer);
+  const emb=gv('cp-emblem')||CFG.emblem;
+  setText('emblem-char', emb);
+  setText('avatar-char',  emb);
+  drawChart();
+}
+
+function liveStatUpdate(i){
+  const nameEl=document.getElementById('sn-'+i);
+  const colEl =document.getElementById('sc-'+i);
+  const symEl =document.getElementById('sym-btn-'+i);
+  if(nameEl) symEl.style.color=colEl?.value||'#fff';
+  // Immediately reflect on the actual stat card
+  const s=CFG.stats[i];
+  if(!s) return;
+  const card=document.getElementById('card-'+s.id);
+  if(card && colEl) card.style.setProperty('--sc',colEl.value);
+  if(card && nameEl){
+    const nameDisplay=card.querySelector('.stat-name');
+    if(nameDisplay) nameDisplay.textContent=(nameEl.value||s.name).toUpperCase();
+  }
+}
+
+function applyAndSave(){
+  const gv=id=>document.getElementById(id)?.value||'';
+
+  // Apply identity
+  CFG.warriorName = gv('cp-warrior-name')||CFG.warriorName;
+  CFG.mainTitle   = gv('cp-main-title')||CFG.mainTitle;
+  CFG.subtitle    = gv('cp-subtitle')||CFG.subtitle;
+  CFG.eyebrow     = gv('cp-eyebrow')||CFG.eyebrow;
+  CFG.footer      = gv('cp-footer')||CFG.footer;
+  CFG.emblem      = gv('cp-emblem')||CFG.emblem;
+  CFG.maxLevel    = parseInt(gv('cp-max-level'))||100;
+
+  // Apply stats
+  CFG.stats.forEach((s,i)=>{
+    s.name  = document.getElementById('sn-'+i)?.value||s.name;
+    s.color = document.getElementById('sc-'+i)?.value||s.color;
+    s.sym   = document.getElementById('sym-btn-'+i)?.textContent?.trim()||s.sym;
+  });
+
+  // Re-render everything
+  applyConfigToDOM();
+  buildStatCards();
+  drawChart();
+  saveToStorage();
+  togglePanel();
+}
+
+function applyConfigToDOM(){
+  setText('hdr-title',   CFG.mainTitle.toUpperCase());
+  setText('hdr-sub',     CFG.subtitle);
+  setText('hdr-eyebrow', CFG.eyebrow.toUpperCase());
+  setText('profile-name',CFG.warriorName.toUpperCase());
+  setText('footer-motto',CFG.footer);
+  setText('emblem-char', CFG.emblem);
+  setText('avatar-char', CFG.emblem);
+  document.title=CFG.mainTitle+' — WARRIOR\'S CODEX';
+}
+
+function confirmReset(){
+  if(confirm('⚠ Reset ALL progress? This cannot be undone.')){
+    CFG.stats.forEach(s=>{ state[s.id]={level:1}; });
+    prevRankMin=0;
+    localStorage.removeItem(LS_STATE);
+    buildStatCards();
+    initAnim(); triggerChartAnim();
+    updateProfile();
+    addLog('▲ Progress reset. Rise again, Warrior.','sys');
+    togglePanel();
+    flashSaveIndicator();
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   12. SYMBOL PICKER
+══════════════════════════════════════════════════════════════ */
+let activeSymIdx = null;
+
+function openSymPicker(i){
+  activeSymIdx=i;
+  const popup=document.getElementById('sym-popup');
+  popup.innerHTML='';
+  SYMBOLS.forEach(sym=>{
+    const btn=document.createElement('div');
+    btn.className='sym-opt'; btn.textContent=sym;
+    btn.onclick=()=>{ pickSym(i,sym); };
+    popup.appendChild(btn);
+  });
+  // Position near the button
+  const srcBtn=document.getElementById('sym-btn-'+i);
+  const rect=srcBtn.getBoundingClientRect();
+  popup.style.display='grid';
+  popup.style.top=(rect.bottom+6)+'px';
+  popup.style.left=Math.max(8,rect.left-80)+'px';
+  // Close on outside click
+  setTimeout(()=>{ document.addEventListener('click',outsideSymClose,{once:true}); },10);
+}
+
+function pickSym(i,sym){
+  const btn=document.getElementById('sym-btn-'+i);
+  if(btn) btn.textContent=sym;
+  closeSymPopup();
+}
+
+function closeSymPopup(){
+  document.getElementById('sym-popup').style.display='none';
+  activeSymIdx=null;
+}
+
+function outsideSymClose(e){
+  const popup=document.getElementById('sym-popup');
+  if(!popup.contains(e.target)) closeSymPopup();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   13. INIT
+══════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  loadFromStorage();
+  applyConfigToDOM();
+  buildStatCards();
+
+  sizeCanvas();
+  window.addEventListener('resize',()=>{ sizeCanvas(); drawChart(); });
+
+  initAnim();
+  animRAF=requestAnimationFrame(animChart);
+
+  updateProfile();
+  addLog('Δ Delta Protocol engaged. Progress restored.','sys');
+  setTimeout(()=>addLog('✦ Click ＋ to gain 1 level · ⚙ to customise everything','sys'),700);
+});
+</script>
+</body>
+</html>
